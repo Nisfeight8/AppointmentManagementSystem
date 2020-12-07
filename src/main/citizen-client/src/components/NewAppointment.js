@@ -128,7 +128,7 @@ export default function NewAppointment() {
             color="primary"
             className={classes.submit}
           >
-            SEND APPLICATION
+            SEND APPOINTMENT
           </Button>
         </form>
             </Container>

@@ -2,6 +2,7 @@ import Signup from './components/Signup'
 import SelectScreen from './components/SelectScreen'
 import Dashboard from './components/Dashboard'
 import NewAppointment from './components/NewAppointment'
+import AllAppointments from './components/AllAppointments'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
       <Route path="/register" exact component={Signup}></Route>
       <Route path="/dashboard" exact component={Dashboard}></Route>
       <Route path="/create/appointment" exact component={NewAppointment}></Route>
+      <Route path="/appointments/:id" exact component={AllAppointments}></Route>
       </Switch>
     </div>
     </Router>

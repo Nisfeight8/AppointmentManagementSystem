@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import appointments.management.system.entities.Carrier;
 import appointments.management.system.entities.User;
+import appointments.management.system.services.CarrierService;
 import appointments.management.system.services.UserService;
 
 @RestController
@@ -28,7 +30,8 @@ import appointments.management.system.services.UserService;
 public class AdminController {
 	@Autowired
 	UserService userService;
-	
+	@Autowired
+	CarrierService carrierService;
 	@GetMapping("/users")
 	@ResponseBody
 	public Collection<User> Users() {
@@ -61,5 +64,16 @@ public class AdminController {
 	public User EditUser(@PathVariable("id") int id, @RequestBody User user) {
 		return userService.update(id, user);
 	}
-
+	@GetMapping("/carriers")
+	@ResponseBody
+	public Collection<Carrier> GetCarriers() {
+		return carrierService.findAll();
+	}
+	@PutMapping("/carriers/{id}/approve")
+	@ResponseBody
+	public Carrier ApproveCarrier(@PathVariable("id")int id,@RequestBody Carrier carr) {
+		Carrier carrier=carrierService.findById(id);
+		carrier.setApproved(carr.isApproved());
+		return carrierService.update(carrier);
+	}
 }

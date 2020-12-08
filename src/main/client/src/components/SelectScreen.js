@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect }from 'react'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +12,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import AuthService from "../services/auth.service";
+
 
 function Copyright() {
   return (
@@ -47,8 +49,51 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+export default function SignIn(props) {
   const classes = useStyles();
+  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    AuthService.login(username, password).then(
+        () => {
+          props.history.push("/dashboard");
+          window.location.reload();
+        },
+        (error) => {
+          const resMessage =
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString();
+
+          setMessage("Invalid login credentials!");
+        }
+      );
+        };
+
+        // const [currentUser, setCurrentUser] = useState({
+        // })
+
+        // useEffect(() => {
+        //   const user = AuthService.getCurrentUser();      
+        //   if (user) {
+        //     setCurrentUser(user);
+        //   }
+        //   if (currentUser.role != undefined) {
+        //     props.history.push("/dashboard");
+        //   }
+
+        // }, []);
+      
+
+
+
 
   return (
     <Container component="main" maxWidth="xs">
@@ -60,7 +105,7 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleLogin}>
         <TextField
             variant="outlined"
             margin="normal"
@@ -68,7 +113,8 @@ export default function SignIn() {
             fullWidth
             type="text"
             label="Username"
-            name="user[username]"
+            name="username"
+            onChange={e => setUsername(e.target.value)}
             autoFocus
           />
           <TextField
@@ -78,7 +124,8 @@ export default function SignIn() {
             fullWidth
             type="password"
             label="Password"
-            name="user[password]"
+            name="password"
+            onChange={e => setPassword(e.target.value)}
             autoFocus
           />
           <Button
@@ -90,6 +137,7 @@ export default function SignIn() {
           >
             Sign In
           </Button>
+          {message}
           <Grid container>
             <Grid item xs>
               Contact your supervisor for any account issues.

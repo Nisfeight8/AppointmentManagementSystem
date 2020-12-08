@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useState, useEffect }from 'react'
 import PropTypes from 'prop-types';
+import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Divider from '@material-ui/core/Divider';
@@ -25,6 +26,9 @@ import SettingsApplicationsOutlinedIcon from '@material-ui/icons/SettingsApplica
 import AddCircleOutlineOutlinedIcon from '@material-ui/icons/AddCircleOutline';
 import EventOutlinedIcon from '@material-ui/icons/EventOutlined';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import AuthService from "../services/auth.service";
+// importing history
+import {useLocation, useHistory} from 'react-router';
 
 const drawerWidth = 240;
 
@@ -78,6 +82,20 @@ function ResponsiveDrawer(props) {
     setMobileOpen(!mobileOpen);
   };
 
+  const [currentUser, setCurrentUser] = useState({
+
+  });
+
+  useEffect(() => {
+    const user = AuthService.getCurrentUser();
+
+    if (user) {
+      setCurrentUser(user);
+      console.log(currentUser);
+    } else {
+      console.log("user not logged");
+    }
+  }, []);
 
 
   const drawer = (
@@ -86,33 +104,50 @@ function ResponsiveDrawer(props) {
 
       <Divider />
       <List>
+          {currentUser.role === "ROLE_EMPLOYEE" &&
           <ListItem button key="Pending" component={Link} to="/carrier/:id/employee/:id/appointments/pending">
             <ListItemIcon><AssignmentOutlinedIcon/></ListItemIcon>
             <ListItemText primary="Pending Appointments" />            
           </ListItem>
+          }
+         {currentUser.role === "ROLE_EMPLOYEE" &&
           <ListItem button key="Handled" component={Link} to="/carrier/:id/employee/:id/appointments/handled">
           <ListItemIcon><AssignmentTurnedInOutlinedIcon/></ListItemIcon>
             <ListItemText primary="Handled Appointments" />
           </ListItem>
-          <Divider />
+          }
+          {/* <Divider /> */}
+          { currentUser.role === "ROLE_SUPERVISOR" &&
           <ListItem button key="NewCarrier" component={Link} to="/create/carrier">
           <ListItemIcon><EditOutlinedIcon/></ListItemIcon>
             <ListItemText primary="Create Carrier" />
           </ListItem>
+          }
+          { currentUser.role === "ROLE_SUPERVISOR" &&
           <ListItem button key="Supervisor" component={Link} to="/carrier/:id/administration">
           <ListItemIcon><BuildOutlinedIcon/></ListItemIcon>
             <ListItemText primary="Carrier Administration" />
           </ListItem>
-          <Divider />
+          }
+          {/* <Divider /> */}
+          { currentUser.role === "ROLE_ADMIN" &&
           <ListItem button key="Administrator" component={Link} to="/administration">
           <ListItemIcon><SettingsApplicationsOutlinedIcon/></ListItemIcon>
             <ListItemText primary="System Administration" />
           </ListItem>
+          }
       </List>
     </div>
   );
 
   const container = window !== undefined ? () => window().document.body : undefined;
+
+const history = useHistory();
+
+  const logout = () => {
+    AuthService.logout();
+    history.push("/")
+  };
 
   return (
     <div className={classes.root}>
@@ -131,6 +166,7 @@ function ResponsiveDrawer(props) {
           <Typography variant="h6" noWrap>
             APPOINTMENT MANAGEMENT
           </Typography>
+          <Button color="inherit" onClick={logout}>LOGOUT</Button>
         </Toolbar>
       </AppBar>
       <Toolbar/>

@@ -91,7 +91,6 @@ function ResponsiveDrawer(props) {
 
     if (user) {
       setCurrentUser(user);
-      console.log(currentUser);
     } else {
       console.log("user not logged");
     }

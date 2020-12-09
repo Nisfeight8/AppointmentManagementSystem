@@ -211,9 +211,23 @@ const handleDialogClose = () => {
 
 // user object to sent for the POST request
 
-const [user, setUser] = React.useState({
+const [user, setUser] = React.useState()
 
-})
+ // Post request to add a θσερ
+
+ const onUserSubmit = (e) => {
+  e.preventDefault()
+  fetch(`/admin/users/create`, {
+    method: 'POST',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + user.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+    body: JSON.stringify(user),
+  })
+  .then(res => res.json())
+  .then(json => setUsers(json.user))
+}
 
 
 // date picker
@@ -240,9 +254,6 @@ const conditions = [
   },
   {
     value: 'ROLE_SUPERVISOR',
-  },
-  {
-    value: 'ROLE_EMPLOYEE',
   },
   {
     value: 'ROLE_USER',
@@ -394,7 +405,7 @@ const conditions = [
         </TabPanel>
       </SwipeableViews>
       <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
-<form className={classes.root} noValidate autoComplete="off" onSubmit>
+<form className={classes.root} noValidate autoComplete="off" onSubmit={onUserSubmit}>
         <DialogTitle id="form-dialog-title">USER CREATION</DialogTitle>
         <DialogContent>
           <DialogContentText>

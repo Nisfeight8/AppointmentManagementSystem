@@ -29,11 +29,11 @@ public class CitizenController {
 	CarrierService carrierService;
 	@Autowired
 	AppointmentService appService;
-	
+
 	@GetMapping("/carriers")
 	@ResponseBody
 	public Collection<Carrier> Carriers() {
-		return carrierService.findAll();
+		return carrierService.findByApproved(true);
 	}
 	@GetMapping("/carriers/{id}")
 	@ResponseBody

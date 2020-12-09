@@ -25,7 +25,6 @@ import appointments.management.system.services.UserService;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequestMapping("/admin")
 public class AdminController {
 	@Autowired
@@ -35,8 +34,7 @@ public class AdminController {
 	@GetMapping("/users")
 	@ResponseBody
 	public Collection<User> Users() {
-		//User user=new User("ROLE_ADMIN","admin","admin199","admin199@gmail.com","admin pap","1111","kallithea","30/1/1999");
-		//userService.save(user);
+		
 		return userService.findAll();
 	}
 

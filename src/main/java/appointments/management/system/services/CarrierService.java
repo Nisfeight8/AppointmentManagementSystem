@@ -14,4 +14,6 @@ public interface CarrierService {
 	Carrier findById(int id);
 
 	Collection<Carrier> findAll();
+	Collection<Carrier> findByApproved(boolean approved);
+
 }

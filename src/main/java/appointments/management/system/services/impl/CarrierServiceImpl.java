@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import appointments.management.system.entities.Carrier;
+import appointments.management.system.entities.Employee;
 import appointments.management.system.entities.Supervisor;
 import appointments.management.system.exception.CustomException;
 import appointments.management.system.entities.Carrier;
@@ -61,5 +62,12 @@ public class CarrierServiceImpl implements CarrierService {
 		Iterable<Carrier> itr = carrierRepository.findAll();
 		return (Collection<Carrier>) itr;
 	}
+
+	@Override
+	public Collection<Carrier> findByApproved(boolean approved) {
+		// TODO Auto-generated method stub
+		return carrierRepository.findByApproved(approved);
+	}
+	
 
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import appointments.management.system.entities.Citizen;
+import appointments.management.system.entities.User;
 import appointments.management.system.payload.request.LoginRequest;
 import appointments.management.system.payload.response.JwtResponse;
 import appointments.management.system.payload.response.MessageResponse;
@@ -27,6 +28,7 @@ import appointments.management.system.repositories.UserRepository;
 import appointments.management.system.security.jwt.JwtUtils;
 import appointments.management.system.security.services.UserDetailsImpl;
 import appointments.management.system.services.CitizenService;
+import appointments.management.system.services.UserService;
 
 
 
@@ -43,13 +45,15 @@ public class AuthController {
 	CitizenService citizenService;
 	@Autowired
 	PasswordEncoder encoder;
-
+	@Autowired
+	UserService userService;
 	@Autowired
 	JwtUtils jwtUtils;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
+		//User user=new User("ROLE_ADMIN","admin","admin199","admin199@gmail.com","admin pap","1111","kallithea","30/1/1999");
+		//userService.save(user);
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 

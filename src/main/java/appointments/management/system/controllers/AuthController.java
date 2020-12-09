@@ -19,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import appointments.management.system.entities.Citizen;
 import appointments.management.system.payload.request.LoginRequest;
 import appointments.management.system.payload.response.JwtResponse;
+import appointments.management.system.payload.response.MessageResponse;
 import appointments.management.system.repositories.UserRepository;
 import appointments.management.system.security.jwt.JwtUtils;
 import appointments.management.system.security.services.UserDetailsImpl;
+import appointments.management.system.services.CitizenService;
 
 
 
@@ -36,7 +39,8 @@ public class AuthController {
 
 	@Autowired
 	UserRepository userRepository;
-
+	@Autowired
+	CitizenService citizenService;
 	@Autowired
 	PasswordEncoder encoder;
 
@@ -61,4 +65,10 @@ public class AuthController {
 												 userDetails.getEmail(), 
 												 userDetails.getRole()));
 	}
+	@PostMapping("/signup")
+	public ResponseEntity<?> citizenSignup(@RequestBody Citizen citizen) {
+		citizenService.save(citizen);
+		return ResponseEntity.ok(new MessageResponse("Citizen registered successfully!"));	}
+	
+	
 }

@@ -28,6 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Employee save(Employee employee, int id) {
 		Carrier carrier= carrierService.findById(id);
+		employee.setRole("ROLE_EMPLOYEE");
 		employee.setCarrier(carrier);
 		return employeeRepository.save(employee);
 	}

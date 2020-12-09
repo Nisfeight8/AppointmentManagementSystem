@@ -30,6 +30,20 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import SendIcon from '@material-ui/icons/Send';
 import AuthService from ".././services/auth.service";
+// Dialog component from Material UI
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardTimePicker,
+    KeyboardDatePicker,
+  } from '@material-ui/pickers';
 
 
 function TabPanel(props) {
@@ -183,6 +197,69 @@ export default function SystemAdministration() {
 
     ]) 
 
+    // dialog for adding users
+
+const [open, setOpen] = React.useState(false);
+
+const handleClickOpen = () => {
+  setOpen(true);
+};
+
+const handleDialogClose = () => {
+  setOpen(false);
+};
+
+// user object to sent for the POST request
+
+const [user, setUser] = React.useState()
+
+ // Post request to add a θσερ
+
+ const onUserSubmit = (e) => {
+  e.preventDefault()
+  fetch(`/admin/users/create`, {
+    method: 'POST',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + user.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+    body: JSON.stringify(user),
+  })
+  .then(res => res.json())
+  .then(json => setUsers(json.user))
+}
+
+
+// date picker
+    
+const [selectedDate, setSelectedDate] = React.useState(new Date('1999-01-01T00:00:00'));
+    
+const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setUser({...user, birthday: date})
+  };
+
+  // condition dropdown options
+
+const [condition, setCondition] = React.useState();
+
+  const handleRoleChange = (event) => {
+    setCondition(event.target.value);
+    setUser({...user, role: event.target.value});
+  };
+
+const conditions = [
+  {
+    value: 'ROLE_ADMIN',
+  },
+  {
+    value: 'ROLE_SUPERVISOR',
+  },
+  {
+    value: 'ROLE_USER',
+  },
+];
+
     return (
         <div>
         <Nav/>
@@ -194,8 +271,8 @@ export default function SystemAdministration() {
         aria-haspopup="true"
         variant="outlined"
         color="primary"
-        onClick={handleClick}
-      >
+        onClick={handleClickOpen}
+        >
         CREATE USER
       </Button>
       <p></p>
@@ -327,6 +404,125 @@ export default function SystemAdministration() {
   </TableContainer>
         </TabPanel>
       </SwipeableViews>
+      <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
+<form className={classes.root} noValidate autoComplete="off" onSubmit={onUserSubmit}>
+        <DialogTitle id="form-dialog-title">USER CREATION</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To add a new user to the system, please use the form below
+          </DialogContentText>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Full name"
+            name="user[fullname]"
+            onChange={e => setUser({...user, fullname: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Address"
+            name="user[address]"
+            onChange={e => setUser({...user, address: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="user[email]"
+            autoComplete="email"
+            autoFocus
+            onChange={e => setUser({...user, email: e.target.value})}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="number"
+            label="Civil Registration Number"
+            name="user[crn]"
+            onChange={e => setUser({...user, crn: e.target.value})}
+            autoFocus
+          />
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <KeyboardDatePicker
+          disableToolbar
+          variant="inline"
+          format="MM/dd/yyyy"
+          margin="normal"
+          id="date-picker-inline"
+          label="Date of Birth"
+          value={selectedDate}
+          name="user[birthday]"
+          fullWidth
+          onChange={handleDateChange}
+          KeyboardButtonProps={{
+            'aria-label': 'change date',
+          }}
+        />
+        </MuiPickersUtilsProvider>
+        <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Username"
+            name="user[username]"
+            onChange={e => setUser({...user, username: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="password"
+            label="Password"
+            name="user[password]"
+            onChange={e => setUser({...user, password: e.target.value})}
+            autoFocus
+          />
+          <p></p>
+          <TextField
+          variant="outlined"
+          id="standard-select-condition"
+          select
+          fullWidth
+          label="User System Role"
+          value={condition}
+          name="user[role]"
+          onChange={handleRoleChange}
+        >
+          {conditions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.value}
+            </MenuItem>
+          ))}
+        </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleDialogClose} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+        </form>
+      </Dialog>
         </Container>
         </div>
         </div>

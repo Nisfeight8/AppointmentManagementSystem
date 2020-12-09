@@ -19,7 +19,6 @@ import appointments.management.system.services.CarrierService;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@PreAuthorize("hasRole('ROLE_EMPLOYEE')")
 @RequestMapping("/employee")
 public class EmployeeController {
 

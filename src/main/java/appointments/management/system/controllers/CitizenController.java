@@ -22,7 +22,6 @@ import appointments.management.system.services.UserService;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@PreAuthorize("hasRole('ROLE_CITIZEN')")
 @RequestMapping("/citizen")
 public class CitizenController {
 	@Autowired

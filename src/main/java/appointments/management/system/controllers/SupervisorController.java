@@ -26,7 +26,6 @@ import appointments.management.system.services.SupervisorService;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-@PreAuthorize("hasRole('ROLE_SUPERVISOR')")
 @RequestMapping("/supervisor")
 public class SupervisorController {
 	@Autowired

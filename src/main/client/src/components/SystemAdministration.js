@@ -37,6 +37,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
+import EditIcon from '@material-ui/icons/Edit';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -181,15 +182,15 @@ export default function SystemAdministration() {
     // }, [currentUser]);
 
   useEffect(() => {
-    const user = AuthService.getCurrentUser();
+    const userReceived = AuthService.getCurrentUser();
     fetch(`http://localhost:8080/admin/users/`, {
         headers: new Headers({
-            'Authorization': 'Bearer ' + user.accessToken, 
+            'Authorization': 'Bearer ' + userReceived.accessToken, 
           }), 
     })
     .then(response => response.json())
     .then(json => setUsers(json))
-}, [])
+}, [users])
 
     // --------------------------
 
@@ -213,20 +214,76 @@ const handleDialogClose = () => {
 
 const [user, setUser] = React.useState()
 
- // Post request to add a θσερ
+ // Post request to add a user
 
  const onUserSubmit = (e) => {
   e.preventDefault()
-  fetch(`/admin/users/create`, {
+  const userReceived = AuthService.getCurrentUser();
+  fetch(`http://localhost:8080/admin/users/create`, {
     method: 'POST',
     headers: new Headers({
-      'Authorization': 'Bearer ' + user.accessToken,
+      'Authorization': 'Bearer ' + userReceived.accessToken,
       "Content-Type": "application/json", 
     }), 
     body: JSON.stringify(user),
   })
   .then(res => res.json())
   .then(json => setUsers(json.user))
+}
+
+// delete request
+
+const deleteUser = (userID) => {
+  const userReceived = AuthService.getCurrentUser();
+  fetch(`http://localhost:8080/admin/users/${userID}/`, {
+    method: 'DELETE',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + userReceived.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+  })
+  .then(response => response.json())
+  console.log(userID + ":user deleted!!!")
+};
+
+// edit request
+
+
+// declaring temporary state for the edit user
+const [editUser, setEditUser] = useState({})
+
+
+// Edit Dialog 
+const [openEditUser, setOpenEditUser] = React.useState(false);
+
+// id passes the selected user through the icon button modify into the editUser state
+
+const handleClickOpenEditUser = (id) => {
+  console.log("User to edit object below:")
+  console.log(id)
+  setEditUser(id);
+  setOpenEditUser(true);
+};
+
+const handleCloseEditUser = () => {
+  setOpenEditUser(false);
+};
+
+// Put request to edit the specific user of the patient
+
+const onEditedUserSubmit = (e) => {
+  e.preventDefault()
+  const userReceived = AuthService.getCurrentUser();
+  fetch(`http://localhost:8080/admin/users/${editUser.id}/edit`, {
+    method: 'PUT',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + userReceived.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+    body: JSON.stringify({user: editUser}),
+  })
+  .then(res => res.json())
+  .then(json => setUsers(json.editUser))
 }
 
 
@@ -237,6 +294,7 @@ const [selectedDate, setSelectedDate] = React.useState(new Date('1999-01-01T00:0
 const handleDateChange = (date) => {
     setSelectedDate(date);
     setUser({...user, birthday: date})
+    setEditUser({...editUser, birthday: date})
   };
 
   // condition dropdown options
@@ -246,6 +304,7 @@ const [condition, setCondition] = React.useState();
   const handleRoleChange = (event) => {
     setCondition(event.target.value);
     setUser({...user, role: event.target.value});
+    setEditUser({...editUser, role: event.target.value});
   };
 
 const conditions = [
@@ -310,7 +369,7 @@ const conditions = [
         </TableRow>
       </TableHead>
       <TableBody>
-        {users.map((user) => (   
+        {users && users.map((user) => (   
       <Slide direction="up" in={users} mountOnEnter unmountOnExit>
       <TableRow key={user.id}>
             <TableCell>{user.fullname}</TableCell>
@@ -320,10 +379,15 @@ const conditions = [
             <TableCell>{user.address}</TableCell>
             <TableCell>{user.birthday}</TableCell>
             <TableCell align="center">
+            <Tooltip title="Modify">
+                        <IconButton aria-label="modify" size="small" onClick={() => handleClickOpenEditUser(user)}>
+                            <EditIcon />
+                         </IconButton>
+                        </Tooltip> 
                       <Tooltip title="Delete">
-                        {/* <IconButton aria-label="delete" onClick={()=>deleteEmployee(employee.id)}> */}
+                        <IconButton aria-label="delete" onClick={()=>deleteUser(user.id)}>
                           <DeleteIcon />
-                        {/* </IconButton> */}
+                        </IconButton>
                        </Tooltip> 
             </TableCell>
           </TableRow>
@@ -519,6 +583,132 @@ const conditions = [
           </Button>
           <Button type="submit" onClick={handleDialogClose} color="primary">
             Add
+          </Button>
+        </DialogActions>
+        </form>
+      </Dialog>
+      {/* EDIT USER DIALOG */}
+      <Dialog open={openEditUser} onClose={handleCloseEditUser} aria-labelledby="form-dialog-title">
+<form className={classes.root} noValidate autoComplete="off" onSubmit={onEditedUserSubmit}>
+          <DialogTitle id="form-dialog-title">Edit User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Currently editing the details of {editUser.username}
+          </DialogContentText>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            value={editUser.fullname}
+            label="Full name"
+            name="user[fullname]"
+            onChange={e => setEditUser({...editUser, fullname: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            value={editUser.address}
+            label="Address"
+            name="user[address]"
+            onChange={e => setEditUser({...editUser, address: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="user[email]"
+            autoComplete="email"
+            value={editUser.email}
+            autoFocus
+            onChange={e => setEditUser({...editUser, email: e.target.value})}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            value={editUser.crn}
+            type="number"
+            label="Civil Registration Number"
+            name="user[crn]"
+            onChange={e => setEditUser({...editUser, crn: e.target.value})}
+            autoFocus
+          />
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <KeyboardDatePicker
+          disableToolbar
+          variant="inline"
+          format="MM/dd/yyyy"
+          margin="normal"
+          id="date-picker-inline"
+          label="Date of Birth"
+          value={selectedDate}
+          name="user[birthday]"
+          fullWidth
+          onChange={handleDateChange}
+          KeyboardButtonProps={{
+            'aria-label': 'change date',
+          }}
+        />
+        </MuiPickersUtilsProvider>
+        <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Username"
+            value={editUser.username}
+            name="user[username]"
+            onChange={e => setEditUser({...editUser, username: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="password"
+            label="Password"
+            name="user[password]"
+            value={editUser.password}
+            onChange={e => setEditUser({...editUser, password: e.target.value})}
+            autoFocus
+          />
+          <p></p>
+          <TextField
+          variant="outlined"
+          id="standard-select-condition"
+          select
+          fullWidth
+          label="User System Role"
+          value={editUser.role}
+          name="user[role]"
+          onChange={handleRoleChange}
+        >
+          {conditions.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.value}
+            </MenuItem>
+          ))}
+        </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleDialogClose} color="primary">
+            Save
           </Button>
         </DialogActions>
         </form>

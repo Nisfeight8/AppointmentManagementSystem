@@ -37,6 +37,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import EditIcon from '@material-ui/icons/Edit';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -170,16 +171,6 @@ export default function SystemAdministration() {
 
     const [accessToken, setAccessToken] = useState(undefined);
 
-    // useEffect(() => {
-    //   const user = AuthService.getCurrentUser();
-    //   if (user) {
-    //     setCurrentUser(user);
-    //     setAccessToken(user.accessToken);
-    //     console.log(accessToken);
-    //   } else {
-    //     console.log("user not logged");
-    //   }
-    // }, [currentUser]);
 
   useEffect(() => {
     const userReceived = AuthService.getCurrentUser();
@@ -274,13 +265,17 @@ const handleCloseEditUser = () => {
 const onEditedUserSubmit = (e) => {
   e.preventDefault()
   const userReceived = AuthService.getCurrentUser();
+  console.log("attempting to send")
+  console.log(editUser);
+  setUser(editUser)
+  console.log(user);
   fetch(`http://localhost:8080/admin/users/${editUser.id}/edit`, {
     method: 'PUT',
     headers: new Headers({
       'Authorization': 'Bearer ' + userReceived.accessToken,
       "Content-Type": "application/json", 
     }), 
-    body: JSON.stringify({user: editUser}),
+    body: JSON.stringify(editUser),
   })
   .then(res => res.json())
   .then(json => setUsers(json.editUser))
@@ -319,6 +314,55 @@ const conditions = [
   },
 ];
 
+
+// receiving all carriers
+
+const [carriers, setCarriers] = useState([
+
+])  
+
+useEffect(() => {
+  const userReceived = AuthService.getCurrentUser();
+  fetch(`http://localhost:8080/admin/carriers/`, {
+      headers: new Headers({
+          'Authorization': 'Bearer ' + userReceived.accessToken, 
+        }), 
+  })
+  .then(response => response.json())
+  .then(json => setCarriers(json))
+}, [carriers])
+
+// Put request to edit the specific user of the patient
+
+const [carrier, setCarrier] = useState({
+
+})  
+
+const approveCarrier = (carrier) => {
+  const userReceived = AuthService.getCurrentUser();
+  console.log(carrier);
+  console.log("attempting to send")
+  setCarrier(carrier)
+  let updatedCarrier = {
+    ...carrier,
+    approved: true,
+  }
+  console.log(updatedCarrier);
+
+  fetch(`http://localhost:8080/admin/carriers/${carrier.id}/approve`, {
+    method: 'PUT',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + userReceived.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+    body: JSON.stringify(updatedCarrier)
+  })
+  .then(res => res.json())
+  .then(json => setCarrier(json.updatedCarrier))
+}
+
+
+
     return (
         <div>
         <Nav/>
@@ -345,7 +389,7 @@ const conditions = [
           aria-label="full width tabs example"
         >
           <Tab label="USERS" {...a11yProps(0)} />
-          <Tab label="CARRIERS" {...a11yProps(1)} />
+          <Tab label="APPROVED CARRIERS" {...a11yProps(1)} />
           <Tab label="CARRIER APPLICATIONS" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
@@ -405,28 +449,22 @@ const conditions = [
           <TableCell><strong>Name</strong></TableCell>
           <TableCell><strong>Description</strong></TableCell>
           <TableCell><strong>Phone</strong></TableCell>
-          <TableCell><strong>Approved</strong></TableCell>
-          <TableCell align="center"><strong>Action</strong></TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
-        {employees.map((employee) => (   
-      <Slide direction="up" in={employees} mountOnEnter unmountOnExit>
-      <TableRow key={employee.id}>
-            <TableCell>{employee.name}</TableCell>
-            <TableCell>{employee.email}</TableCell>
-            <TableCell align="right">{employee.phone}</TableCell>
-            <TableCell align="right">{employee.address}</TableCell>
-            <TableCell align="right">{employee.birth}</TableCell>
-            <TableCell align="center">
-                      <Tooltip title="Delete">
-                        {/* <IconButton aria-label="delete" onClick={()=>deleteEmployee(employee.id)}> */}
-                          <DeleteIcon />
-                        {/* </IconButton> */}
-                       </Tooltip> 
-            </TableCell>
+        {carriers.map((carrier) => (   
+                  <>
+              { carrier.approved === true &&
+      <Slide direction="up" in={carriers} mountOnEnter unmountOnExit>
+      <TableRow key={carrier.id}>
+            <TableCell>{carrier.name}</TableCell>
+            <TableCell>{carrier.description}</TableCell>
+            <TableCell>{carrier.phone}</TableCell>
+            {/* <TableCell>{carrier.approved === false ? "Not Approved" : "Approved"}</TableCell> */}
           </TableRow>
           </Slide>
+          }
+          </>
         ))}
       </TableBody>
     </Table>
@@ -445,23 +483,26 @@ const conditions = [
         </TableRow>
       </TableHead>
       <TableBody>
-        {employees.map((employee) => (   
-      <Slide direction="up" in={employees} mountOnEnter unmountOnExit>
-      <TableRow key={employee.id}>
-            <TableCell>{employee.name}</TableCell>
-            <TableCell>{employee.email}</TableCell>
-            <TableCell align="right">{employee.phone}</TableCell>
-            <TableCell align="right">{employee.address}</TableCell>
-            <TableCell align="right">{employee.birth}</TableCell>
+        {carriers.map((carrier) => (   
+                  <>
+              { carrier.approved === false &&
+      <Slide direction="up" in={carriers} mountOnEnter unmountOnExit>
+      <TableRow key={carrier.id}>
+            <TableCell>{carrier.name}</TableCell>
+            <TableCell>{carrier.description}</TableCell>
+            <TableCell>{carrier.phone}</TableCell>
+            <TableCell>{carrier.approved === false ? "Not Approved" : "Approved"}</TableCell>
             <TableCell align="center">
-                      <Tooltip title="Delete">
-                        {/* <IconButton aria-label="delete" onClick={()=>deleteEmployee(employee.id)}> */}
-                          <DeleteIcon />
-                        {/* </IconButton> */}
+                      <Tooltip title="Approve">
+                        <IconButton aria-label="approve" onClick={()=>approveCarrier(carrier)}>
+                          <ThumbUpIcon />
+                        </IconButton>
                        </Tooltip> 
             </TableCell>
           </TableRow>
           </Slide>
+          }
+          </>
         ))}
       </TableBody>
     </Table>
@@ -687,6 +728,7 @@ const conditions = [
           />
           <p></p>
           <TextField
+          disabled
           variant="outlined"
           id="standard-select-condition"
           select
@@ -704,10 +746,10 @@ const conditions = [
         </TextField>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
+          <Button onClick={handleCloseEditUser} color="primary">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleDialogClose} color="primary">
+          <Button type="submit" onClick={handleCloseEditUser} color="primary">
             Save
           </Button>
         </DialogActions>

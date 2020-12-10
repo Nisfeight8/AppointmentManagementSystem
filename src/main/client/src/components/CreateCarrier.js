@@ -16,6 +16,8 @@ import Nav from './Nav'
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
+import AuthService from ".././services/auth.service";
+
 
 
 function Copyright() {
@@ -68,6 +70,29 @@ export default function CreateCarrier() {
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
 
+  // user object to sent for the POST request
+
+const [carrier, setCarrier] = React.useState({})
+
+// Post request to add a carrier
+
+const onCarrierSubmit = (e) => {
+ e.preventDefault()
+ const userReceived = AuthService.getCurrentUser();
+ console.log(carrier)
+ console.log("sending")
+ fetch(`http://localhost:8080/supervisor/${userReceived.id}/carriers/create`, {
+   method: 'POST',
+   headers: new Headers({
+     'Authorization': 'Bearer ' + userReceived.accessToken,
+     "Content-Type": "application/json", 
+   }), 
+   body: JSON.stringify(carrier),
+ })
+ .then(res => res.json())
+ .then(json => setCarrier(json.carrier))
+}
+
     return (
       <div>
       <Nav/>
@@ -81,7 +106,7 @@ export default function CreateCarrier() {
         <Typography component="h1" variant="h5">
           Carrier Registration Application Form
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={onCarrierSubmit}>
         <TextField
             variant="outlined"
             margin="normal"
@@ -90,6 +115,7 @@ export default function CreateCarrier() {
             type="text"
             label="Carrier"
             name="carrier[name]"
+            onChange={e => setCarrier({...carrier, name: e.target.value})}
             autoFocus
           />
           <TextField
@@ -100,7 +126,8 @@ export default function CreateCarrier() {
             required
             fullWidth
             label="Carrier Phone Number"
-            name="carrier[phoneNumber]"
+            name="carrier[phone]"
+            onChange={e => setCarrier({...carrier, phone: e.target.value})}
             autoFocus
           />
           <TextField
@@ -113,6 +140,7 @@ export default function CreateCarrier() {
             type="text"
             label="Carrier Description"
             name="carrier[description]"
+            onChange={e => setCarrier({...carrier, description: e.target.value})}
             autoFocus
           />
           <Button

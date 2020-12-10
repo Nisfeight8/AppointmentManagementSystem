@@ -35,6 +35,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import AuthService from ".././services/auth.service";
+import EditIcon from '@material-ui/icons/Edit';
 import { useHistory } from 'react-router'
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
@@ -130,7 +132,111 @@ const handleDateChange = (date) => {
     setEmployee({...employee, birth: date})
   };
 
+  // const [carrier, setCarrier] = useState({
 
+  // })
+
+//   useEffect(() => {
+//     const userReceived = AuthService.getCurrentUser();
+//     console.log("User received");
+//     console.log(userReceived);
+//     fetch(`http://localhost:8080/supervisor/${userReceived.id}/carriers`, {
+//         headers: new Headers({
+//             'Authorization': 'Bearer ' + userReceived.accessToken, 
+//           }), 
+//     })
+//     .then(response => response.json())
+//     .then(json => setCarrier(json))
+//     .then(console.log("useEffect to get carrier"))
+//     .then(console.log(carrier))
+// }, [])
+
+//   const [users, setUsers] = useState([
+
+//   ])  
+
+//   useEffect(() => {
+//     const userReceived = AuthService.getCurrentUser();
+//     console.log("useEffect to get employees")
+//     console.log(carrier)
+//     fetch(`http://localhost:8080/supervisor/carriers/${carrier.id}/employees`, {
+//         headers: new Headers({
+//             'Authorization': 'Bearer ' + userReceived.accessToken, 
+//           }), 
+//     })
+//     .then(response => response.json())
+//     .then(json => setUsers(json))
+// }, [])
+
+
+// delete request
+
+// const deleteUser = (userID) => {
+//   const userReceived = AuthService.getCurrentUser();
+//   fetch(`http://localhost:8080/admin/users/${userID}/`, {
+//     method: 'DELETE',
+//     headers: new Headers({
+//       'Authorization': 'Bearer ' + userReceived.accessToken,
+//       "Content-Type": "application/json", 
+//     }), 
+//   })
+//   .then(response => response.json())
+//   console.log(userID + ":user deleted!!!")
+// };
+
+
+// Fetches current user information and then stores it into currentUser state
+
+const [currentUser, setCurrentUser] = useState({
+
+});
+
+useEffect(() => {
+  const user = AuthService.getCurrentUser();
+  console.log(user);
+
+  if (user) {
+    setCurrentUser(user);
+    console.log(currentUser);
+  } else {
+    console.log("user not logged");
+  }
+}, []);
+
+// Fetches the carrier that the user is supervisor in 
+
+
+const [carrier, setCarrier] = useState({
+
+});
+
+useEffect(() => {
+    console.log(currentUser);
+    console.log("ELAAAA");
+    fetch(`http://localhost:8080/supervisor/${currentUser.id}/carriers`, {
+        headers: new Headers({
+            'Authorization': 'Bearer ' + currentUser.accessToken, 
+          }), 
+    })
+    .then(response => response.json())
+    .then(json => setCarrier(json))
+}, [carrier])
+
+const [users, setUsers] = useState([
+
+])
+
+// fetches the users from the specific carrier
+
+useEffect(() => {
+  fetch(`http://localhost:8080/supervisor/${carrier.id}/users/`, {
+      headers: new Headers({
+          'Authorization': 'Bearer ' + currentUser.accessToken, 
+        }), 
+  })
+  .then(response => response.json())
+  .then(json => setUsers(json))
+}, [users])
 
     return (
         <div>
@@ -149,38 +255,45 @@ const handleDateChange = (date) => {
       {/* overflow hides the scrollbar at the table on patient GET/POST/UPDATE/DELETE */}
       <TableContainer component={Paper} style={{overflow: "hidden"}}>
       <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell><strong>Name</strong></TableCell>
-            <TableCell><strong>Email</strong></TableCell>
-            <TableCell><strong>Phone</strong></TableCell>
-            <TableCell><strong>Address</strong></TableCell>
-            <TableCell><strong>Date of birth</strong></TableCell>
-            <TableCell align="center"><strong>Action</strong></TableCell>
+      <TableHead>
+        <TableRow>
+          <TableCell><strong>Name</strong></TableCell>
+          <TableCell><strong>Email</strong></TableCell>
+          <TableCell><strong>Civil Registration Number</strong></TableCell>
+          <TableCell><strong>System Role</strong></TableCell>
+          <TableCell><strong>Address</strong></TableCell>
+          <TableCell><strong>Date of birth</strong></TableCell>
+          <TableCell align="center"><strong>Action</strong></TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {users && users.map((user) => (   
+      <Slide direction="up" in={users} mountOnEnter unmountOnExit>
+      <TableRow key={user.id}>
+            <TableCell>{user.fullname}</TableCell>
+            <TableCell>{user.email}</TableCell>
+            <TableCell>{user.crn}</TableCell>
+            <TableCell>{user.role}</TableCell>
+            <TableCell>{user.address}</TableCell>
+            <TableCell>{user.birthday}</TableCell>
+            <TableCell align="center">
+            <Tooltip title="Modify">
+                        {/* <IconButton aria-label="modify" size="small" onClick={() => handleClickOpenEditUser(user)}> */}
+                            <EditIcon />
+                         {/* </IconButton> */}
+                        </Tooltip> 
+                      <Tooltip title="Delete">
+                        {/* <IconButton aria-label="delete" onClick={()=>deleteUser(user.id)}> */}
+                          <DeleteIcon />
+                        {/* </IconButton> */}
+                       </Tooltip> 
+            </TableCell>
           </TableRow>
-        </TableHead>
-        <TableBody>
-          {employees.map((employee) => (   
-        <Slide direction="up" in={employees} mountOnEnter unmountOnExit>
-        <TableRow key={employee.id}>
-              <TableCell>{employee.name}</TableCell>
-              <TableCell>{employee.email}</TableCell>
-              <TableCell align="right">{employee.phone}</TableCell>
-              <TableCell align="right">{employee.address}</TableCell>
-              <TableCell align="right">{employee.birth}</TableCell>
-              <TableCell align="center">
-                        <Tooltip title="Delete">
-                          <IconButton aria-label="delete" onClick={()=>deleteEmployee(employee.id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                         </Tooltip> 
-              </TableCell>
-            </TableRow>
-            </Slide>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </Slide>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
     <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
     <form className={classes.root} noValidate autoComplete="off" onSubmit={onSubmit}>
         <DialogTitle id="form-dialog-title">Add employee</DialogTitle>

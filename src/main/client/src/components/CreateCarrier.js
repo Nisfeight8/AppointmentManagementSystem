@@ -93,6 +93,20 @@ const onCarrierSubmit = (e) => {
  .then(json => setCarrier(json.carrier))
 }
 
+// // GET Request to receive a carrier
+
+// useEffect(() => {
+//   const userReceived = AuthService.getCurrentUser();
+//   fetch(`http://localhost:8080/admin/users/${userReceived.id}`, {
+//       headers: new Headers({
+//           'Authorization': 'Bearer ' + userReceived.accessToken, 
+//         }), 
+//   })
+//   .then(response => response.json())
+//   .then(json => setCarrier(json))
+//   .then(console.log(carrier))
+// }, [])
+
     return (
       <div>
       <Nav/>

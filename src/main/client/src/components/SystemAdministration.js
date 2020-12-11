@@ -120,7 +120,8 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
     },
     table: {
-      minWidth: 650,
+      minWidth: 750,
+      maxWdith: 750,
     },
     addEmployeeButton: {
       backgroundColor: "black",
@@ -404,8 +405,9 @@ const approveCarrier = (carrier) => {
       <TableHead>
         <TableRow>
           <TableCell><strong>Name</strong></TableCell>
+          <TableCell><strong>Username</strong></TableCell>
           <TableCell><strong>Email</strong></TableCell>
-          <TableCell><strong>Civil Registration Number</strong></TableCell>
+          <TableCell><strong>CRN</strong></TableCell>
           <TableCell><strong>System Role</strong></TableCell>
           <TableCell><strong>Address</strong></TableCell>
           <TableCell><strong>Date of birth</strong></TableCell>
@@ -417,6 +419,7 @@ const approveCarrier = (carrier) => {
       <Slide direction="up" in={users} mountOnEnter unmountOnExit>
       <TableRow key={user.id}>
             <TableCell>{user.fullname}</TableCell>
+            <TableCell>{user.username}</TableCell>
             <TableCell>{user.email}</TableCell>
             <TableCell>{user.crn}</TableCell>
             <TableCell>{user.role}</TableCell>

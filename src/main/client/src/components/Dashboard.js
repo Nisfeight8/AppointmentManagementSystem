@@ -86,6 +86,7 @@ export default function Dashboard() {
             <h1>Welcome {currentUser.username}</h1>
             <h2>Your user ID is {currentUser.id}</h2>
             <h2>{supervisor.name}</h2>
+            <h2>{supervisor.id} this is the carrier ID</h2>
             </Typography>
         </Container>
         </div>

@@ -55,6 +55,10 @@ function Copyright() {
     submit: {
       margin: theme.spacing(3, 0, 2),
     },
+    typography2: {
+      width: '100%',
+      maxWidth: 500,
+    },
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -65,7 +69,7 @@ function Copyright() {
     return ['Fill out the carrier registration form', 'Submit the application', 'Add your employees'];
   }
 
-export default function CreateCarrier() {
+export default function CreateCarrier(props) {
     const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
@@ -91,6 +95,7 @@ const onCarrierSubmit = (e) => {
  })
  .then(res => res.json())
  .then(json => setCarrier(json.carrier))
+ .then(props.history.push('/create/carrier/submitted'))
 }
 
 // // GET Request to receive a carrier
@@ -107,12 +112,50 @@ const onCarrierSubmit = (e) => {
 //   .then(console.log(carrier))
 // }, [])
 
+const [currentUser, setCurrentUser] = useState({
+
+});
+
+useEffect(() => {
+  const user = AuthService.getCurrentUser();
+  // console.log(user);
+
+  if (user) {
+    setCurrentUser(user);
+    // console.log(currentUser);
+  } else {
+    console.log("user not logged");
+  }
+}, []);
+
+// Fetches the carrier that the user is supervisor in 
+
+
+const [fetchedCarrier, setFetchedCarrier] = useState({
+
+});
+
+useEffect(() => {
+    // console.log(currentUser);
+    // console.log("ELAAAA");
+    fetch(`http://localhost:8080/supervisor/${currentUser.id}/carriers`, {
+        headers: new Headers({
+            'Authorization': 'Bearer ' + currentUser.accessToken, 
+          }), 
+    })
+    .then(response => response.json())
+    .then(json => setFetchedCarrier(json))
+    .then(console.log(fetchedCarrier))
+}, [fetchedCarrier])
+
+
     return (
       <div>
       <Nav/>
       <div className={classes.content}>
         <Container component="main" maxWidth="xs" className={classes.toolbar}>
       <CssBaseline />
+      {fetchedCarrier.name === undefined && 
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
@@ -175,6 +218,17 @@ const onCarrierSubmit = (e) => {
         ))}
       </Stepper>
       </div>
+      }
+         {fetchedCarrier && 
+      <div className={classes.paper}>
+<Typography variant="subtitle1" className={classes.typography2} gutterBottom>
+        You have already sent in an application for carrier registration.
+      </Typography>
+      <Typography variant="subtitle1" className={classes.typography2} gutterBottom>
+        APPLICATION STATUS: {fetchedCarrier.approved === false ? "Pending" : "Approved"}
+      </Typography>            
+      </div>
+      }
       <Box mt={8}>
         <Copyright />
       </Box>

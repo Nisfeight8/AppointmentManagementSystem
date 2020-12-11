@@ -47,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(3, 0, 2),
     backgroundColor: "black",
   },
+  error: {
+    color: "red",
+  }
 }));
 
 export default function SignIn(props) {
@@ -72,7 +75,7 @@ export default function SignIn(props) {
             error.message ||
             error.toString();
 
-          setMessage("Invalid login credentials!");
+          setMessage("Invalid login credentials! Please try again.");
         }
       );
         };
@@ -137,7 +140,7 @@ export default function SignIn(props) {
           >
             Sign In
           </Button>
-          {message}
+          <span className={classes.error}>{message}</span>
           <Grid container>
             <Grid item xs>
               Contact your supervisor for any account issues.

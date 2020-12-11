@@ -67,125 +67,28 @@ const useStyles = makeStyles((theme) => ({
   export default function DataTable() {
     const classes = useStyles();
 
-  // GET/Fetch all patients, listener for patients
-
-const [employees, setEmployees] = React.useState([
-
-])
-
-const [employee, setEmployee] = React.useState({
-
-})
-
-// useEffect(() => {
-//     fetch(`http://192.168.0.7:8000/carrier/${user.carrierID}/employees`)
-//     .then(response => response.json())
-//     .then(json => setEmployees(json))
-
-// }, [])
-
-// DELETE patient on click event on line 177
-
-  const deleteEmployee = (employeeID) => {
-    console.log(employeeID)
-      fetch('http://192.168.0.7:8000/employee/delete/' + employeeID, {
-        method: 'DELETE',
-        headers: {"Access-Control-Allow-Origin": "*"},
-      })
-      .then(response => response.json())
-      console.log(employeeID + "HELLO!!!")
-  };
-
 // add employee dialog
 
 const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+const handleClickOpen = () => {
+  setOpen(true);
+};
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+const handleDialogClose = () => {
+  setOpen(false);
+};
 
-  const history = useHistory()
-
-
-  const onSubmit = (e) => {
-    e.preventDefault()
-    fetch(`http://192.168.0.7:8000/employee/create`, {
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(employee),
-    })
-    .then(res => res.json())
-    .then(json => setEmployees(json.employee))
-    window.location.reload()   
-  }
-
-  // date picker
+// date picker for employees
 
 const [selectedDate, setSelectedDate] = React.useState(new Date('2020-01-01T00:00:00'));
 
 const handleDateChange = (date) => {
     setSelectedDate(date);
-    setEmployee({...employee, birth: date})
+    setEmployee({...employee, birthday: date})
   };
 
-  // const [carrier, setCarrier] = useState({
-
-  // })
-
-//   useEffect(() => {
-//     const userReceived = AuthService.getCurrentUser();
-//     console.log("User received");
-//     console.log(userReceived);
-//     fetch(`http://localhost:8080/supervisor/${userReceived.id}/carriers`, {
-//         headers: new Headers({
-//             'Authorization': 'Bearer ' + userReceived.accessToken, 
-//           }), 
-//     })
-//     .then(response => response.json())
-//     .then(json => setCarrier(json))
-//     .then(console.log("useEffect to get carrier"))
-//     .then(console.log(carrier))
-// }, [])
-
-//   const [users, setUsers] = useState([
-
-//   ])  
-
-//   useEffect(() => {
-//     const userReceived = AuthService.getCurrentUser();
-//     console.log("useEffect to get employees")
-//     console.log(carrier)
-//     fetch(`http://localhost:8080/supervisor/carriers/${carrier.id}/employees`, {
-//         headers: new Headers({
-//             'Authorization': 'Bearer ' + userReceived.accessToken, 
-//           }), 
-//     })
-//     .then(response => response.json())
-//     .then(json => setUsers(json))
-// }, [])
-
-
-// delete request
-
-// const deleteUser = (userID) => {
-//   const userReceived = AuthService.getCurrentUser();
-//   fetch(`http://localhost:8080/admin/users/${userID}/`, {
-//     method: 'DELETE',
-//     headers: new Headers({
-//       'Authorization': 'Bearer ' + userReceived.accessToken,
-//       "Content-Type": "application/json", 
-//     }), 
-//   })
-//   .then(response => response.json())
-//   console.log(userID + ":user deleted!!!")
-// };
-
-
-// Fetches current user information and then stores it into currentUser state
+  // Fetches current user information and then stores it into currentUser state
 
 const [currentUser, setCurrentUser] = useState({
 
@@ -193,11 +96,11 @@ const [currentUser, setCurrentUser] = useState({
 
 useEffect(() => {
   const user = AuthService.getCurrentUser();
-  console.log(user);
+  // console.log(user);
 
   if (user) {
     setCurrentUser(user);
-    console.log(currentUser);
+    // console.log(currentUser);
   } else {
     console.log("user not logged");
   }
@@ -211,32 +114,92 @@ const [carrier, setCarrier] = useState({
 });
 
 useEffect(() => {
-    console.log(currentUser);
-    console.log("ELAAAA");
-    fetch(`http://localhost:8080/supervisor/${currentUser.id}/carriers`, {
-        headers: new Headers({
-            'Authorization': 'Bearer ' + currentUser.accessToken, 
-          }), 
-    })
-    .then(response => response.json())
-    .then(json => setCarrier(json))
-}, [carrier])
+  fetch(`http://localhost:8080/supervisor/${currentUser.id}/carriers`, {
+          headers: new Headers({
+              'Authorization': 'Bearer ' + currentUser.accessToken, 
+            }), 
+      })
+      .then(response => response.json())
+      .then(json => setCarrier(json))
+  }, [currentUser]); //Should be currentUser not carrier
 
-const [users, setUsers] = useState([
+const [employees, setEmployees] = useState([
 
 ])
 
 // fetches the users from the specific carrier
 
-useEffect(() => {
-  fetch(`http://localhost:8080/supervisor/${carrier.id}/users/`, {
+useEffect( () => {
+  fetch(`http://localhost:8080/supervisor/carriers/${carrier.id}/employees/`, {
       headers: new Headers({
           'Authorization': 'Bearer ' + currentUser.accessToken, 
         }), 
   })
   .then(response => response.json())
-  .then(json => setUsers(json))
-}, [users])
+  .then(json => setEmployees(json))
+}, [employees])
+
+//  // Post request to add a user
+
+const [employee, setEmployee] = useState({})
+
+
+ const onEmployeeSubmit = (e) => {
+  e.preventDefault()
+  const userReceived = AuthService.getCurrentUser();
+  console.log(employee)
+  console.log("employee to send")
+  fetch(`http://localhost:8080/supervisor/carriers/${carrier.id}/employees/create`, {
+    method: 'POST',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + userReceived.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+    body: JSON.stringify(employee),
+  })
+  .then(res => res.json())
+  .then(json => setEmployee(json.employee))
+  .then(setEmployees(employee))
+}
+
+// DELETE EMPLOYEE / USER
+
+// delete request
+
+const deleteUser = (employeeID) => {
+  console.log(employeeID)
+  const userReceived = AuthService.getCurrentUser();
+  fetch(`http://localhost:8080/supervisor/carriers/${carrier.id}/employees/${employeeID}`, {
+    method: 'DELETE',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + userReceived.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+  })
+  .then(response => response.json())
+  console.log(employeeID + ":employee deleted!!!")
+};
+
+// Put request to edit the specific employee
+
+// const onEditedUserSubmit = (e) => {
+//   e.preventDefault()
+//   const userReceived = AuthService.getCurrentUser();
+//   console.log("attempting to send")
+//   console.log(editEmployee);
+//   setUser(editEmployee)
+//   console.log(user);
+//   fetch(`http://localhost:8080/admin/users/${editUser.id}/edit`, {
+//     method: 'PUT',
+//     headers: new Headers({
+//       'Authorization': 'Bearer ' + userReceived.accessToken,
+//       "Content-Type": "application/json", 
+//     }), 
+//     body: JSON.stringify(editUser),
+//   })
+//   .then(res => res.json())
+//   .then(json => setUsers(json.editUser))
+// }
 
     return (
         <div>
@@ -258,34 +221,36 @@ useEffect(() => {
       <TableHead>
         <TableRow>
           <TableCell><strong>Name</strong></TableCell>
+          <TableCell><strong>Username</strong></TableCell>
           <TableCell><strong>Email</strong></TableCell>
           <TableCell><strong>Civil Registration Number</strong></TableCell>
-          <TableCell><strong>System Role</strong></TableCell>
+          {/* <TableCell><strong>System Role</strong></TableCell> */}
           <TableCell><strong>Address</strong></TableCell>
           <TableCell><strong>Date of birth</strong></TableCell>
           <TableCell align="center"><strong>Action</strong></TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
-        {users && users.map((user) => (   
-      <Slide direction="up" in={users} mountOnEnter unmountOnExit>
-      <TableRow key={user.id}>
-            <TableCell>{user.fullname}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>{user.crn}</TableCell>
-            <TableCell>{user.role}</TableCell>
-            <TableCell>{user.address}</TableCell>
-            <TableCell>{user.birthday}</TableCell>
+        {employees.length > 0 && employees.map((employeeCarrier) => (   
+      <Slide direction="up" in={employees} mountOnEnter unmountOnExit>
+      <TableRow key={employeeCarrier.id}>
+            <TableCell>{employeeCarrier.fullname}</TableCell>
+            <TableCell>{employeeCarrier.username}</TableCell>
+            <TableCell>{employeeCarrier.email}</TableCell>
+            <TableCell>{employeeCarrier.crn}</TableCell>
+            {/* <TableCell>{employeeCarrier.role}</TableCell> */}
+            <TableCell>{employeeCarrier.address}</TableCell>
+            <TableCell>{employeeCarrier.birthday}</TableCell>
             <TableCell align="center">
-            <Tooltip title="Modify">
-                        {/* <IconButton aria-label="modify" size="small" onClick={() => handleClickOpenEditUser(user)}> */}
+            {/* <Tooltip title="Modify">
+                        <IconButton aria-label="modify" size="small" onClick={() => handleClickOpenEditUser(user)}>
                             <EditIcon />
-                         {/* </IconButton> */}
-                        </Tooltip> 
+                         </IconButton>
+                        </Tooltip>  */}
                       <Tooltip title="Delete">
-                        {/* <IconButton aria-label="delete" onClick={()=>deleteUser(user.id)}> */}
+                        <IconButton aria-label="delete" onClick={()=>deleteUser(employeeCarrier.id)}>
                           <DeleteIcon />
-                        {/* </IconButton> */}
+                        </IconButton>
                        </Tooltip> 
             </TableCell>
           </TableRow>
@@ -294,39 +259,59 @@ useEffect(() => {
       </TableBody>
     </Table>
   </TableContainer>
-    <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-    <form className={classes.root} noValidate autoComplete="off" onSubmit={onSubmit}>
-        <DialogTitle id="form-dialog-title">Add employee</DialogTitle>
+  <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
+<form className={classes.root} noValidate autoComplete="off" onSubmit={onEmployeeSubmit}>
+        <DialogTitle id="form-dialog-title">EMPLOYEE CREATION</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To add an employee, please fill out the form below.
+            To add a new employee to the system, please use the form below
           </DialogContentText>
-          <TextField 
-        id="standard-basic" 
-        margin="dense"
-        fullWidth
-        label="Name"
-        name="employee[name]"
-        onChange={e => setEmployee({...employee, name: e.target.value})}
-        />
-        <TextField 
-        id="standard-basic" 
-        margin="dense"
-        type="number"
-        fullWidth
-        label="Phone number"
-        name="employee[phone]"
-        onChange={e => setEmployee({...employee, phone: e.target.value})}
-        />
-        <TextField 
-        id="standard-basic" 
-        margin="dense"
-        fullWidth
-        label="Address"
-        name="employee[address]"
-        onChange={e => setEmployee({...employee, address: e.target.value})}
-        />
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Full name"
+            name="employee[fullname]"
+            onChange={e => setEmployee({...employee, fullname: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Address"
+            name="employee[address]"
+            onChange={e => setEmployee({...employee, address: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="employee[email]"
+            autoComplete="email"
+            autoFocus
+            onChange={e => setEmployee({...employee, email: e.target.value})}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="number"
+            label="Civil Registration Number"
+            name="employee[crn]"
+            onChange={e => setEmployee({...employee, crn: e.target.value})}
+            autoFocus
+          />
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
           disableToolbar
           variant="inline"
@@ -335,7 +320,7 @@ useEffect(() => {
           id="date-picker-inline"
           label="Date of Birth"
           value={selectedDate}
-          name="patient[birth]"
+          name="employee[birthday]"
           fullWidth
           onChange={handleDateChange}
           KeyboardButtonProps={{
@@ -343,26 +328,34 @@ useEffect(() => {
           }}
         />
         </MuiPickersUtilsProvider>
-        <TextField 
-        id="standard-basic" 
-        margin="dense"
-        fullWidth
-        label="Username"
-        name="employee[username]"
-        onChange={e => setEmployee({...employee, username: e.target.value})}
-        />
-        <TextField 
-        id="standard-basic" 
-        margin="dense"
-        fullWidth
-        label="Password"
-        type="password"
-        name="employee[password]"
-        onChange={e => setEmployee({...employee, password: e.target.value})}
-        />
+        <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="text"
+            label="Username"
+            name="employee[username]"
+            onChange={e => setEmployee({...employee, username: e.target.value})}
+            autoFocus
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            type="password"
+            label="Password"
+            name="employeee[password]"
+            onChange={e => setEmployee({...employee, password: e.target.value})}
+            autoFocus
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="outlined" color="black" type="submit" color="primary">
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button type="submit" onClick={handleDialogClose} color="primary">
             Add
           </Button>
         </DialogActions>

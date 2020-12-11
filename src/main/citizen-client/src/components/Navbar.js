@@ -5,7 +5,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles } from '@material-ui/core/styles';
-
+import AuthService from "../services/auth.service";
+// importing history
+import {useLocation, useHistory} from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -16,13 +18,19 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar() {
   const classes = useStyles();
+  const history = useHistory();
+
+  const logout = () => {
+    AuthService.logout();
+    history.push("/")
+  };
 
     return (
         <AppBar position="relative">
         <Toolbar>
           <LockIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={logout}>
                 LOGOUT
            </Button>
           </Typography>

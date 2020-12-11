@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect }from 'react'
+import AuthService from ".././services/auth.service";
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import LockIcon from '@material-ui/icons/Lock';
@@ -65,6 +66,21 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Album() {
   const classes = useStyles();
+  const [currentUser, setCurrentUser] = useState({
+
+  });
+  
+  useEffect(() => {
+    const user = AuthService.getCurrentUser();
+    console.log(user);
+  
+    if (user) {
+      setCurrentUser(user);
+      console.log(currentUser);
+    } else {
+      console.log("user not logged");
+    }
+  }, []);
 
   return (
     <React.Fragment>
@@ -86,7 +102,7 @@ export default function Album() {
         <Fade in={true} timeout={3500}>
           <Container maxWidth="sm">
             <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-              Welcome back!
+              Welcome back, {currentUser.username}!
             </Typography>
             <Typography variant="h5" align="center" color="textSecondary" paragraph>
               We've made vast improvements with the site, making it even easier to schedule and manage your appointments!

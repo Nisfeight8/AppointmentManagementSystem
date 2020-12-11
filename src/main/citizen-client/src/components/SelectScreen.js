@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect }from 'react'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -24,6 +24,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import AuthService from "../services/auth.service";
 
 
 
@@ -67,6 +68,9 @@ const useStyles = makeStyles((theme) => ({
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
+  error: {
+    color: "red",
+  },
   submitCitizen: {
     margin: theme.spacing(3, 0, 2),
   },
@@ -82,8 +86,33 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
  
-export default function SelectScreen() {
+export default function SelectScreen(props) {
   const classes = useStyles();
+  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    AuthService.login(username, password).then(
+        () => {
+          props.history.push("/dashboard");
+          window.location.reload();
+        },
+        (error) => {
+          const resMessage =
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString();
+
+          setMessage("Invalid login credentials! Please try again.");
+        }
+      );
+        };
 
   const [open, setOpen] = React.useState(false);
 
@@ -132,53 +161,6 @@ export default function SelectScreen() {
       </Grid>
     </Grid>
       <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle id="alert-dialog-slide-title">{"Fill out the form with your login credentials."}</DialogTitle>
-        <DialogContent>
-        <form className={classes.form} noValidate>
-        <FormControl className={classes.form}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            type="text"
-            label="Username"
-            name="username"
-            autoFocus
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submitEmployee}
-          >
-            Sign In
-          </Button>
-          <FormHelperText id="my-helper-text">Please contact your supervisor if you forgot your login credentials.</FormHelperText>
-          </FormControl>
-          </form>
-        </DialogContent>
-      </Dialog>
-      <Dialog
         open={openCitizen}
         TransitionComponent={TransitionCitizen}
         keepMounted
@@ -188,7 +170,7 @@ export default function SelectScreen() {
       >
         <DialogTitle id="alert-dialog-slide-title">{"Fill out the form with your login credentials."}</DialogTitle>
         <DialogContent>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleLogin}>
         <FormControl className={classes.form}>
           <TextField
             variant="outlined"
@@ -198,6 +180,7 @@ export default function SelectScreen() {
             type="text"
             label="Username"
             name="username"
+            onChange={e => setUsername(e.target.value)}
             autoFocus
           />
           <TextField
@@ -208,6 +191,7 @@ export default function SelectScreen() {
             name="password"
             label="Password"
             type="password"
+            onChange={e => setPassword(e.target.value)}
             id="password"
             autoComplete="current-password"
           />
@@ -220,6 +204,7 @@ export default function SelectScreen() {
           >
             Sign In
           </Button>
+          <span className={classes.error}>{message}</span>
           <FormHelperText id="my-helper-text">Please contact an administrator if you forgot your login credentials.</FormHelperText>
           </FormControl>
           </form>

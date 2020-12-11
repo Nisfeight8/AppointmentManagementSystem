@@ -9,13 +9,20 @@ public class JwtResponse {
 	private String username;
 	private String email;
 	private String role;
-
-	public JwtResponse(String accessToken, int id, String username, String email, String role) {
+	private String fullname;
+	private String crn;
+	private String address;
+	private String birthday;
+	public JwtResponse(String accessToken, int id, String username, String email, String role,String fullname,String crn,String address,String birthday) {
 		this.token = accessToken;
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.role = role;
+		this.fullname=fullname;
+		this.crn=crn;
+		this.address=address;
+		this.birthday=birthday;
 	}
 
 	public String getAccessToken() {
@@ -61,4 +68,41 @@ public class JwtResponse {
 	public String getRole() {
 		return role;
 	}
+
+	public String getFullname() {
+		return fullname;
+	}
+
+	public void setFullname(String fullname) {
+		this.fullname = fullname;
+	}
+
+	public String getCrn() {
+		return crn;
+	}
+
+	public void setCrn(String crn) {
+		this.crn = crn;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(String birthday) {
+		this.birthday = birthday;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
 }

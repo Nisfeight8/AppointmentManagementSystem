@@ -14,6 +14,7 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import 'date-fns';
+import AuthService from ".././services/auth.service";
 import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider,
@@ -66,12 +67,9 @@ import {
 
 
 
-export default function Signup() {
+export default function Signup(props) {
     const classes = useStyles();
 
-    const [user, setUser] = React.useState({
-
-    })
     
      // date picker
     
@@ -79,8 +77,40 @@ export default function Signup() {
     
      const handleDateChange = (date) => {
          setSelectedDate(date);
-         setUser({...user, birthday: date})
+         setBirthday(date)
        };
+
+  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [fullname, setFullname] = useState("");
+  const [crn, setCRN] = useState("");
+  const [birthday, setBirthday] = useState("");
+
+
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    AuthService.register(username, email, password, fullname, crn, address, birthday).then(
+        () => {
+          props.history.push("/");
+          window.location.reload();
+        },
+        (error) => {
+          const resMessage =
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString();
+
+          setMessage(error);
+        }
+      );
+        };
 
 
     return (
@@ -199,7 +229,7 @@ export default function Signup() {
           <Typography component="h1" variant="h5">
             Account Registration
           </Typography>
-          <form className={classes.form} noValidate>
+          <form className={classes.form} noValidate onSubmit={handleRegister}>
         <TextField
             variant="outlined"
             margin="normal"
@@ -207,7 +237,8 @@ export default function Signup() {
             fullWidth
             type="text"
             label="Full name"
-            name="user[fullname]"
+            name="fullname"
+            onChange={e => setFullname(e.target.value)}
             autoFocus
           />
           <TextField
@@ -217,7 +248,8 @@ export default function Signup() {
             fullWidth
             type="text"
             label="Address"
-            name="user[address]"
+            name="address"
+            onChange={e => setAddress(e.target.value)}
             autoFocus
           />
           <TextField
@@ -227,8 +259,9 @@ export default function Signup() {
             fullWidth
             id="email"
             label="Email Address"
-            name="user[email]"
+            name="email"
             autoComplete="email"
+            onChange={e => setEmail(e.target.value)}
             autoFocus
           />
           <TextField
@@ -238,7 +271,8 @@ export default function Signup() {
             fullWidth
             type="number"
             label="Civil Registration Number"
-            name="user[CRN]"
+            name="crn"
+            onChange={e => setCRN(e.target.value)}
             autoFocus
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -265,7 +299,8 @@ export default function Signup() {
             fullWidth
             type="text"
             label="Username"
-            name="user[username]"
+            name="username"
+            onChange={e => setUsername(e.target.value)}
             autoFocus
           />
           <TextField
@@ -275,7 +310,8 @@ export default function Signup() {
             fullWidth
             type="password"
             label="Password"
-            name="user[password]"
+            name="password"
+            onChange={e => setPassword(e.target.value)}
             autoFocus
           />
           <Button

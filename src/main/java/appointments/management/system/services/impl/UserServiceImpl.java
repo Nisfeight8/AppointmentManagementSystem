@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
 	private UserRepository userRepository;
 	@Autowired
 	PasswordEncoder passwordEncode;
+
 	@Override
 	public User save(User user) {
 		if (userRepository.findByEmail(user.getEmail()) != null) {
@@ -85,7 +86,9 @@ public class UserServiceImpl implements UserService {
 			newUser.setUsername(user.getUsername());
 			newUser.setCrn(user.getCrn());
 			newUser.setBirthday(user.getBirthday());
-			newUser.setPassword(passwordEncode.encode(user.getPassword()));
+			if (!newUser.getPassword().equals(user.getPassword())) {
+				newUser.setPassword(passwordEncode.encode(user.getPassword()));
+			}
 			return userRepository.save(newUser);
 		}
 

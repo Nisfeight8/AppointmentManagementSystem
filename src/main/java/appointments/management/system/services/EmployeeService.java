@@ -9,7 +9,7 @@ public interface EmployeeService {
 
     Boolean delete(int id);
 
-    Employee update(Employee employee);
+    Employee update(int id,Employee employee);
 
     Employee findById(int id);
 

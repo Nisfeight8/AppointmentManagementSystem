@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -67,6 +68,11 @@ public class SupervisorController {
 	@ResponseBody
 	public Employee GetEmployee(@PathVariable("id") int id, @PathVariable("id2") int id2) {
 		return employeeService.findById(id2);
+	}
+	@PutMapping("/carriers/{id}/employees/{id2}/edit")
+	@ResponseBody
+	public Employee EditEmployee(@PathVariable("id") int id, @PathVariable("id2") int id2,@RequestBody Employee employee) {
+		return employeeService.update(id2, employee);
 	}
 
 	@DeleteMapping("/carriers/{id}/employees/{id2}")

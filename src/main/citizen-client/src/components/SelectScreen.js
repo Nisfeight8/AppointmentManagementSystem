@@ -132,6 +132,7 @@ export default function SelectScreen(props) {
 
   const handleCloseCitizen = () => {
     setOpenCitizen(false);
+    setMessage("");
   };
 
 

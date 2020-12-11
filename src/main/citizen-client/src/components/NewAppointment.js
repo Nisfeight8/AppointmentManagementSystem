@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect }from 'react'
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import LockIcon from '@material-ui/icons/Lock';
@@ -22,6 +22,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import 'date-fns';
+import AuthService from ".././services/auth.service";
 import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider,
@@ -81,6 +82,51 @@ const useStyles = makeStyles((theme) => ({
 export default function NewAppointment() {
     const classes = useStyles();
 
+    const [carriers, setCarriers] = React.useState([
+
+    ])
+
+      useEffect(() => {
+      const userReceived = AuthService.getCurrentUser();
+      fetch(`http://localhost:8080/citizen/carriers`, {
+          headers: new Headers({
+              'Authorization': 'Bearer ' + userReceived.accessToken, 
+            }), 
+      })
+      .then(response => response.json())
+      .then(json => setCarriers(json))
+  }, [carriers])
+
+  const [carrierInfo, setCarrierInfo] = React.useState({
+
+  })
+
+  const handleClick = (carrier) => {
+    setCarrierInfo({...carrierInfo, 
+      id: carrier.id
+  })
+    console.log(carrierInfo.id)
+  }
+
+  const [appointment, setAppointment] = React.useState({
+
+  })
+
+  const onAppointmentSubmit = (e) => {
+    e.preventDefault()
+    const userReceived = AuthService.getCurrentUser();
+    fetch(`http://localhost:8080/citizen/${userReceived.id}/carriers/${carrierInfo.id}/appointment/create`, {
+      method: 'POST',
+      headers: new Headers({
+        'Authorization': 'Bearer ' + userReceived.accessToken,
+        "Content-Type": "application/json", 
+      }), 
+      body: JSON.stringify(appointment),
+    })
+    .then(res => res.json())
+    .then(console.log(appointment))
+    .then(json => setAppointment(json.appointment))
+  }
 
     
     // date picker
@@ -90,6 +136,7 @@ export default function NewAppointment() {
     const handleDateChange = (date) => {
         setSelectedDate(date);
         // setUser({...user, birthday: date})
+        setAppointment({...appointment, appointmentDate: date})
       };
 
 
@@ -121,17 +168,18 @@ export default function NewAppointment() {
               <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
                 New Appointment
               </Typography>
-              <form className={classes.form} noValidate>
+              <form className={classes.form} noValidate onSubmit={onAppointmentSubmit}>
         <TextField
             variant="outlined"
             margin="normal"
             required
             InputLabelProps={{shrink: true}}
             fullWidth
-            disabled
+            // disabled
             type="text"
             label="Name"
-            name="appointment[citizenName]"
+            name="appointment[citizenFullName]"
+            onChange={e => setAppointment({...appointment, citizenFullName: e.target.value})}
             autoFocus
           />
           <TextField
@@ -140,10 +188,11 @@ export default function NewAppointment() {
             required
             fullWidth
             InputLabelProps={{shrink: true}}
-            disabled
+            // disabled
             type="text"
             label="Civil Registration Number"
             name="appointment[citizenCRN]"
+            onChange={e => setAppointment({...appointment, citizenCRN: e.target.value})}
             autoFocus
           />
           <br></br>
@@ -162,9 +211,11 @@ export default function NewAppointment() {
           <MenuItem value="">
             <em>None</em>
           </MenuItem>
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {carriers && carriers.map((carrier) => (   
+                <MenuItem value={carrier.id} onClick={()=>handleClick(carrier)}>
+                <em>{carrier.name}</em>
+              </MenuItem>
+       ))}
         </Select>        
         <FormHelperText>Select a carrier to schedule your appointment with.</FormHelperText>
       </FormControl>
@@ -178,7 +229,7 @@ export default function NewAppointment() {
           id="date-picker-inline"
           label="Appointment Date"
           value={selectedDate}
-          name="appointment[appointment_date]"
+          name="appointment[appointmentDate]"
           fullWidth
           onChange={handleDateChange}
           KeyboardButtonProps={{

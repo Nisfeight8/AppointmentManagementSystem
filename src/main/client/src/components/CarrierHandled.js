@@ -11,10 +11,13 @@ import TableRow from '@material-ui/core/TableRow';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Tooltip from '@material-ui/core/Tooltip';
 import Slide from '@material-ui/core/Slide';
+import AuthService from ".././services/auth.service";
+
 
 
 
@@ -38,11 +41,88 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function CarrierHandled() {
+export default function CarrierApproved() {
 
   const [employees, setEmployees] = React.useState([
 
   ])
+
+    // Fetches current user information and then stores it into currentUser state
+
+const [currentUser, setCurrentUser] = useState({
+
+});
+
+useEffect(() => {
+  const user = AuthService.getCurrentUser();
+  // console.log(user);
+
+  if (user) {
+    setCurrentUser(user);
+    // console.log(currentUser);
+  } else {
+    console.log("user not logged");
+  }
+}, []);
+
+// Fetches the carrier that the user is supervisor in 
+
+
+const [carrier, setCarrier] = useState({
+
+});
+
+useEffect(() => {
+  fetch(`http://localhost:8080/employee/${currentUser.id}/carriers`, {
+          headers: new Headers({
+              'Authorization': 'Bearer ' + currentUser.accessToken, 
+            }), 
+      })
+      .then(response => response.json())
+      .then(json => setCarrier(json))
+  }, [currentUser]); //Should be currentUser not carrier
+
+const [appointments, setAppointments] = useState([
+
+])
+
+// fetches the users from the specific carrier
+
+useEffect( () => {
+  fetch(`http://localhost:8080/employee/carriers/${carrier.id}/appointments/`, {
+      headers: new Headers({
+          'Authorization': 'Bearer ' + currentUser.accessToken, 
+        }), 
+  })
+  .then(response => response.json())
+  .then(json => setAppointments(json))
+}, [appointments])
+
+// approving appointment
+
+const approveAppointment = (appointment) => {
+  const userReceived = AuthService.getCurrentUser();
+  console.log("before approval")
+  console.log(appointment);
+  console.log("attempting to send")
+  let updatedAppointment = {
+    ...appointment,
+    approved: true,
+  }
+  console.log(updatedAppointment);
+
+  fetch(`http://localhost:8080/employee/carriers/${carrier.id}/appointments/${appointment.id}/approve`, {
+    method: 'PUT',
+    headers: new Headers({
+      'Authorization': 'Bearer ' + userReceived.accessToken,
+      "Content-Type": "application/json", 
+    }), 
+    body: JSON.stringify(updatedAppointment)
+  })
+  .then(res => res.json())
+  // .then(json => setAppointment(json.updatedAppointment))
+}
+
 
 
     const classes = useStyles();
@@ -66,32 +146,34 @@ export default function CarrierHandled() {
     <Table className={classes.table} aria-label="simple table">
       <TableHead>
         <TableRow>
-          <TableCell><strong>Name</strong></TableCell>
-          <TableCell><strong>Email</strong></TableCell>
-          <TableCell><strong>Phone</strong></TableCell>
-          <TableCell><strong>Address</strong></TableCell>
-          <TableCell><strong>Date of birth</strong></TableCell>
-          <TableCell align="center"><strong>Action</strong></TableCell>
+          <TableCell><strong>Citizen</strong></TableCell>
+          <TableCell><strong>Civil Registration Number</strong></TableCell>
+          <TableCell><strong>Appointment Date</strong></TableCell>
+          <TableCell><strong>Status</strong></TableCell>
+          {/* <TableCell align="center"><strong>Action</strong></TableCell> */}
         </TableRow>
       </TableHead>
       <TableBody>
-        {employees.map((employee) => (   
-      <Slide direction="up" in={employees} mountOnEnter unmountOnExit>
-      <TableRow key={employee.id}>
-            <TableCell>{employee.name}</TableCell>
-            <TableCell>{employee.email}</TableCell>
-            <TableCell align="right">{employee.phone}</TableCell>
-            <TableCell align="right">{employee.address}</TableCell>
-            <TableCell align="right">{employee.birth}</TableCell>
+        {appointments.length > 0 && appointments.map((appointment) => (
+        <>
+        {appointment.approved === true &&     
+      <Slide direction="up" in={appointments} mountOnEnter unmountOnExit>
+      <TableRow key={appointment.id}>
+            <TableCell>{appointment.citizenFullName}</TableCell>
+            <TableCell>{appointment.citizenCRN}</TableCell>
+            <TableCell>{appointment.appointmentDate}</TableCell>
+            <TableCell>{appointment.approved === false ? "Pending" : "Approved"}</TableCell>
             <TableCell align="center">
-                      <Tooltip title="Delete">
-                        {/* <IconButton aria-label="delete" onClick={()=>deleteEmployee(employee.id)}> */}
-                          <DeleteIcon />
-                        {/* </IconButton> */}
-                       </Tooltip> 
+                 {/* <Tooltip title="Approve">
+                        <IconButton aria-label="approve" onClick={()=>approveAppointment(appointment)}>
+                          <ThumbUpIcon />
+                        </IconButton>
+                       </Tooltip>  */}
             </TableCell>
           </TableRow>
           </Slide>
+          }
+          </>
         ))}
       </TableBody>
     </Table>

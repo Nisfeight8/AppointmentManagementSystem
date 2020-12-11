@@ -59,21 +59,34 @@ export default function Dashboard() {
       }
     }, []);
 
-    const [supervisor, setSupervisor] = useState({
+    // const [carrier, setCarrier] = useState({
 
-    });
-
-    useEffect(() => {
-        console.log(currentUser);
-        console.log("ELAAAA");
-        fetch(`http://localhost:8080/supervisor/${currentUser.id}/carriers`, {
-            headers: new Headers({
-                'Authorization': 'Bearer ' + currentUser.accessToken, 
-              }), 
-        })
-        .then(response => response.json())
-        .then(json => setSupervisor(json))
-    }, [supervisor])
+    // });
+    
+    // useEffect(() => {
+    //     console.log(currentUser);
+    //     console.log("ELAAAA");
+    //     if (currentUser.role === "ROLE_SUPERVISOR") {
+    //       console.log("fetching supervisor")
+    //       fetch(`http://localhost:8080/supervisor/${currentUser.id}/carriers`, {
+    //         headers: new Headers({
+    //             'Authorization': 'Bearer ' + currentUser.accessToken, 
+    //           }), 
+    //     })
+    //     .then(response => response.json())
+    //     .then(json => setCarrier(json))
+    //     } else if (currentUser.role === "ROLE_EMPLOYEE") {
+    //       console.log("fetching employee")
+    //       fetch(`http://localhost:8080/employee/${currentUser.id}/carriers`, {
+    //         headers: new Headers({
+    //             'Authorization': 'Bearer ' + currentUser.accessToken, 
+    //           }), 
+    //     })
+    //     .then(response => response.json())
+    //     .then(json => setCarrier(json))
+    //     }
+        
+    // }, [carrier])
 
 
     return (
@@ -85,8 +98,8 @@ export default function Dashboard() {
             <br></br>
             <h1>Welcome {currentUser.username}</h1>
             <h2>Your user ID is {currentUser.id}</h2>
-            <h2>{supervisor.name}</h2>
-            <h2>{supervisor.id} this is the carrier ID</h2>
+            {/* <h2>{carrier.name}</h2>
+            <h2>{carrier.id} this is the carrier ID</h2> */}
             </Typography>
         </Container>
         </div>

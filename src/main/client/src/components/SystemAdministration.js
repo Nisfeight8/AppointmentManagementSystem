@@ -311,7 +311,7 @@ const conditions = [
     value: 'ROLE_SUPERVISOR',
   },
   {
-    value: 'ROLE_USER',
+    value: 'ROLE_CITIZEN',
   },
 ];
 

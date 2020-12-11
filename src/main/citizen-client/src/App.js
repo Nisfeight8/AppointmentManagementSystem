@@ -31,13 +31,13 @@ function App() {
       <Switch>
       <Route path="/" exact component={SelectScreen}></Route>
       <Route path="/register" exact component={Signup}></Route>
-      { currentUser.role === "ROLE_USER" &&
+      { currentUser.role === "ROLE_CITIZEN" &&
       <Route path="/dashboard" exact component={Dashboard}></Route>
       }
-     { currentUser.role === "ROLE_USER" &&
+     { currentUser.role === "ROLE_CITIZEN" &&
       <Route path="/create/appointment" exact component={NewAppointment}></Route>
     }
-    { currentUser.role === "ROLE_USER" &&
+    { currentUser.role === "ROLE_CITIZEN" &&
       <Route path="/appointments/:id" exact component={AllAppointments}></Route>
     }
     <Route path='*' exact={true} component={Error} />

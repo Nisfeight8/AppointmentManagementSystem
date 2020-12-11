@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-export default function NewAppointment() {
+export default function NewAppointment(props) {
     const classes = useStyles();
 
     const [carriers, setCarriers] = React.useState([
@@ -126,6 +126,7 @@ export default function NewAppointment() {
     .then(res => res.json())
     .then(console.log(appointment))
     .then(json => setAppointment(json.appointment))
+    .then(props.history.push('/appointments/:id'))
   }
 
     

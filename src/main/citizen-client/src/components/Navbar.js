@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles } from '@material-ui/core/styles';
 import AuthService from "../services/auth.service";
+import {Link} from 'react-router-dom';
 // importing history
 import {useLocation, useHistory} from 'react-router';
 
@@ -29,6 +30,11 @@ export default function Navbar() {
         <AppBar position="relative">
         <Toolbar>
           <LockIcon className={classes.icon} />
+          <Typography variant="h6" color="inherit" noWrap>
+          <Button variant="contained" color="primary" component={Link} to="/dashboard">
+                DASHBOARD
+           </Button>
+          </Typography>
           <Typography variant="h6" color="inherit" noWrap>
           <Button variant="contained" color="primary" onClick={logout}>
                 LOGOUT

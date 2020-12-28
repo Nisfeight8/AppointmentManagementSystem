@@ -1,5 +1,6 @@
-import React, { useState, useEffect }from 'react'
+import React, { useState, useEffect, useRef }from 'react'
 import {makeStyles, useTheme, withStyles} from '@material-ui/core/styles';
+import {ValidatorForm, TextValidator} from 'react-material-ui-form-validator'
 import Container from '@material-ui/core/Container';
 import Nav from './Nav'
 import Tabs from '@material-ui/core/Tabs';
@@ -204,7 +205,7 @@ const handleDialogClose = () => {
 
 // user object to sent for the POST request
 
-const [user, setUser] = React.useState()
+const [user, setUser] = React.useState({})
 
  // Post request to add a user
 
@@ -221,6 +222,17 @@ const [user, setUser] = React.useState()
   })
   .then(res => res.json())
   .then(json => setUsers(json.user))
+  .then(json => setUser({
+    fullname: "",
+    address: "",
+    email: "",
+    username: "",
+    password: "",
+    crn: "",
+    role: "",
+    birthday: ""
+  }))
+  .then(setOpen(false));
 }
 
 // delete request
@@ -280,6 +292,17 @@ const onEditedUserSubmit = (e) => {
   })
   .then(res => res.json())
   .then(json => setUsers(json.editUser))
+  .then(json => setEditUser({
+    fullname: "",
+    address: "",
+    email: "",
+    username: "",
+    password: "",
+    crn: "",
+    role: "",
+    birthday: ""
+  }))
+  .then(setOpenEditUser(false))
 }
 
 
@@ -362,7 +385,9 @@ const approveCarrier = (carrier) => {
   .then(json => setCarrier(json.updatedCarrier))
 }
 
-
+// for form validation in notes
+const form = useRef();
+const form2 = useRef();
 
     return (
         <div>
@@ -513,38 +538,45 @@ const approveCarrier = (carrier) => {
         </TabPanel>
       </SwipeableViews>
       <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
-<form className={classes.root} noValidate autoComplete="off" onSubmit={onUserSubmit}>
+{/* <form className={classes.root} noValidate autoComplete="off" onSubmit={onUserSubmit}> */}
+<ValidatorForm
+            ref={form}
+            onSubmit={onUserSubmit}
+            onError={errors => console.log(errors)}>
         <DialogTitle id="form-dialog-title">USER CREATION</DialogTitle>
         <DialogContent>
           <DialogContentText>
             To add a new user to the system, please use the form below
           </DialogContentText>
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Full name"
             name="user[fullname]"
             onChange={e => setUser({...user, fullname: e.target.value})}
+            value={user.fullname}
+            validators={['required']}
+            errorMessages={['Please add a full name to the user!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Address"
             name="user[address]"
             onChange={e => setUser({...user, address: e.target.value})}
+            value={user.address}
+            validators={['required']}
+            errorMessages={['Please add an address to the user!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             id="email"
             label="Email Address"
@@ -552,16 +584,21 @@ const approveCarrier = (carrier) => {
             autoComplete="email"
             autoFocus
             onChange={e => setUser({...user, email: e.target.value})}
+            value={user.email}
+            validators={['required']}
+            errorMessages={['Please add an e-mail address to the user!']}
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="number"
             label="Civil Registration Number"
             name="user[crn]"
             onChange={e => setUser({...user, crn: e.target.value})}
+            value={user.crn}
+            validators={['required']}
+            errorMessages={['Please add a civil regsitration number to the user!']}
             autoFocus
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -581,30 +618,34 @@ const approveCarrier = (carrier) => {
           }}
         />
         </MuiPickersUtilsProvider>
-        <TextField
+        <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Username"
             name="user[username]"
             onChange={e => setUser({...user, username: e.target.value})}
+            value={user.username}
+            validators={['required']}
+            errorMessages={['Please add a username to the user!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="password"
             label="Password"
             name="user[password]"
             onChange={e => setUser({...user, password: e.target.value})}
+            value={user.password}
+            validators={['required']}
+            errorMessages={['Please add a password to the user!']}
             autoFocus
           />
           <p></p>
-          <TextField
+          <TextValidator
           variant="outlined"
           id="standard-select-condition"
           select
@@ -612,6 +653,8 @@ const approveCarrier = (carrier) => {
           label="User System Role"
           value={condition}
           name="user[role]"
+          validators={['required']}
+          errorMessages={['Please add a system role to the user!']}
           onChange={handleRoleChange}
         >
           {conditions.map((option) => (
@@ -619,54 +662,62 @@ const approveCarrier = (carrier) => {
               {option.value}
             </MenuItem>
           ))}
-        </TextField>
+        </TextValidator>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleDialogClose} color="primary">
+          <Button type="submit" color="primary">
             Add
           </Button>
         </DialogActions>
-        </form>
+        </ValidatorForm>
+        {/* </form> */}
       </Dialog>
       {/* EDIT USER DIALOG */}
       <Dialog open={openEditUser} onClose={handleCloseEditUser} aria-labelledby="form-dialog-title">
-<form className={classes.root} noValidate autoComplete="off" onSubmit={onEditedUserSubmit}>
+{/* <form className={classes.root} noValidate autoComplete="off" onSubmit={onEditedUserSubmit}> */}
+<ValidatorForm
+            ref={form2}
+            onSubmit={onEditedUserSubmit}
+            onError={errors => console.log(errors)}>
           <DialogTitle id="form-dialog-title">Edit User</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Currently editing the details of {editUser.username}
           </DialogContentText>
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             value={editUser.fullname}
             label="Full name"
             name="user[fullname]"
             onChange={e => setEditUser({...editUser, fullname: e.target.value})}
+            value={editUser.fullname}
+            validators={['required']}
+            errorMessages={['Please add a full name to the user!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             value={editUser.address}
             label="Address"
             name="user[address]"
             onChange={e => setEditUser({...editUser, address: e.target.value})}
+            value={editUser.address}
+            validators={['required']}
+            errorMessages={['Please add an address to the user!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             id="email"
             label="Email Address"
@@ -675,17 +726,22 @@ const approveCarrier = (carrier) => {
             value={editUser.email}
             autoFocus
             onChange={e => setEditUser({...editUser, email: e.target.value})}
+            value={editUser.email}
+            validators={['required']}
+            errorMessages={['Please add an e-mail address to the user!']}
           />
           <TextField
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             value={editUser.crn}
             type="number"
             label="Civil Registration Number"
             name="user[crn]"
             onChange={e => setEditUser({...editUser, crn: e.target.value})}
+            value={editUser.crn}
+            validators={['required']}
+            errorMessages={['Please add a civil registration number to the user!']}
             autoFocus
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -705,28 +761,32 @@ const approveCarrier = (carrier) => {
           }}
         />
         </MuiPickersUtilsProvider>
-        <TextField
+        <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Username"
             value={editUser.username}
             name="user[username]"
             onChange={e => setEditUser({...editUser, username: e.target.value})}
+            value={editUser.username}
+            validators={['required']}
+            errorMessages={['Please add a username to the user!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="password"
             label="Password"
             name="user[password]"
             value={editUser.password}
             onChange={e => setEditUser({...editUser, password: e.target.value})}
+            value={editUser.password}
+            validators={['required']}
+            errorMessages={['Please add a password!']}
             autoFocus
           />
           <p></p>
@@ -752,11 +812,12 @@ const approveCarrier = (carrier) => {
           <Button onClick={handleCloseEditUser} color="primary">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleCloseEditUser} color="primary">
+          <Button type="submit" color="primary">
             Save
           </Button>
         </DialogActions>
-        </form>
+        </ValidatorForm>
+        {/* </form> */}
       </Dialog>
         </Container>
         </div>

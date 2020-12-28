@@ -1,4 +1,5 @@
-import React, { useState, useEffect }from 'react'
+import React, { useState, useEffect, useRef }from 'react'
+import {ValidatorForm, TextValidator} from 'react-material-ui-form-validator'
 import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
 import { TransitionGroup } from 'react-transition-group';
@@ -160,6 +161,16 @@ const [employee, setEmployee] = useState({})
   .then(res => res.json())
   .then(json => setEmployee(json.employee))
   .then(setEmployees(employee))
+  .then(json => setEmployee({
+    fullname: "",
+    address: "",
+    email: "",
+    username: "",
+    password: "",
+    crn: "",
+    birthday: ""
+  }))
+  .then(setOpen(false))
 }
 
 // DELETE EMPLOYEE / USER
@@ -200,6 +211,11 @@ const deleteUser = (employeeID) => {
 //   .then(res => res.json())
 //   .then(json => setUsers(json.editUser))
 // }
+
+// for form validation in notes
+const form = useRef();
+const form2 = useRef();
+
 
     return (
         <div>
@@ -260,38 +276,45 @@ const deleteUser = (employeeID) => {
     </Table>
   </TableContainer>
   <Dialog open={open} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
-<form className={classes.root} noValidate autoComplete="off" onSubmit={onEmployeeSubmit}>
+{/* <form className={classes.root} noValidate autoComplete="off" onSubmit={onEmployeeSubmit}> */}
+<ValidatorForm
+            ref={form}
+            onSubmit={onEmployeeSubmit}
+            onError={errors => console.log(errors)}>
         <DialogTitle id="form-dialog-title">EMPLOYEE CREATION</DialogTitle>
         <DialogContent>
           <DialogContentText>
             To add a new employee to the system, please use the form below
           </DialogContentText>
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Full name"
             name="employee[fullname]"
             onChange={e => setEmployee({...employee, fullname: e.target.value})}
+            value={employee.fullname}
+            validators={['required']}
+            errorMessages={['Please add a full name to the employee!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Address"
             name="employee[address]"
             onChange={e => setEmployee({...employee, address: e.target.value})}
+            value={employee.address}
+            validators={['required']}
+            errorMessages={['Please add an address to the employee!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             id="email"
             label="Email Address"
@@ -299,16 +322,21 @@ const deleteUser = (employeeID) => {
             autoComplete="email"
             autoFocus
             onChange={e => setEmployee({...employee, email: e.target.value})}
+            value={employee.email}
+            validators={['required']}
+            errorMessages={['Please add an e-mail address to the employee!']}
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="number"
             label="Civil Registration Number"
             name="employee[crn]"
             onChange={e => setEmployee({...employee, crn: e.target.value})}
+            value={employee.crn}
+            validators={['required']}
+            errorMessages={['Please add a civil registration number to the employee!']}
             autoFocus
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -328,26 +356,30 @@ const deleteUser = (employeeID) => {
           }}
         />
         </MuiPickersUtilsProvider>
-        <TextField
+        <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Username"
             name="employee[username]"
             onChange={e => setEmployee({...employee, username: e.target.value})}
+            value={employee.username}
+            validators={['required']}
+            errorMessages={['Please add a username to the employee!']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="password"
             label="Password"
             name="employeee[password]"
             onChange={e => setEmployee({...employee, password: e.target.value})}
+            value={employee.password}
+            validators={['required']}
+            errorMessages={['Please add a password to the employee!']}
             autoFocus
           />
         </DialogContent>
@@ -355,11 +387,12 @@ const deleteUser = (employeeID) => {
           <Button onClick={handleDialogClose} color="primary">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleDialogClose} color="primary">
+          <Button type="submit" color="primary">
             Add
           </Button>
         </DialogActions>
-        </form>
+        {/* </form> */}
+        </ValidatorForm>
       </Dialog>
         </Container>
         </div>

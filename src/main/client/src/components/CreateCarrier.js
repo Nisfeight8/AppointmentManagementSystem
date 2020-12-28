@@ -1,4 +1,5 @@
-import React, { useState, useEffect }from 'react'
+import React, { useState, useEffect, useRef }from 'react'
+import {ValidatorForm, TextValidator} from 'react-material-ui-form-validator'
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -148,6 +149,7 @@ useEffect(() => {
     .then(console.log(fetchedCarrier))
 }, [fetchedCarrier])
 
+const form = useRef();
 
     return (
       <div>
@@ -163,41 +165,51 @@ useEffect(() => {
         <Typography component="h1" variant="h5">
           Carrier Registration Application Form
         </Typography>
-        <form className={classes.form} noValidate onSubmit={onCarrierSubmit}>
-        <TextField
+        {/* <form className={classes.form} noValidate onSubmit={onCarrierSubmit}> */}
+        <ValidatorForm
+            ref={form}
+            onSubmit={onCarrierSubmit}
+            onError={errors => console.log(errors)}>
+        <TextValidator
             variant="outlined"
             margin="normal"
-            required
             fullWidth
             type="text"
             label="Carrier"
             name="carrier[name]"
             onChange={e => setCarrier({...carrier, name: e.target.value})}
+            value={carrier.name}
+            validators={['required']}
+            errorMessages={['Please add a name to your carrier.']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
             id="standard-multiline-static"
             type="number"
-            required
             fullWidth
             label="Carrier Phone Number"
             name="carrier[phone]"
             onChange={e => setCarrier({...carrier, phone: e.target.value})}
+            value={carrier.phone}
+            validators={['required']}
+            errorMessages={['Please add a phone number to your carrier.']}
             autoFocus
           />
-          <TextField
+          <TextValidator
             variant="outlined"
             margin="normal"
             id="standard-multiline-static"
             multiline
-            required
             fullWidth
             type="text"
             label="Carrier Description"
             name="carrier[description]"
             onChange={e => setCarrier({...carrier, description: e.target.value})}
+            value={carrier.description}
+            validators={['required']}
+            errorMessages={['Please add a description to the carrier.']}
             autoFocus
           />
           <Button
@@ -209,7 +221,8 @@ useEffect(() => {
           >
             SEND APPLICATION
           </Button>
-        </form>
+        {/* </form> */}
+        </ValidatorForm>
         <Stepper activeStep={activeStep} alternativeLabel className={classes.stepper}>
         {steps.map((label) => (
           <Step key={label}>

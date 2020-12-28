@@ -62,12 +62,15 @@ public class AuthController {
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
 		
-
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
 												 userDetails.getEmail(), 
-												 userDetails.getRole()));
+												 userDetails.getRole(),
+												 userDetails.getFullname(),
+												 userDetails.getCrn(),
+												 userDetails.getAddress(),
+												 userDetails.getBirthday()));
 	}
 	@PostMapping("/signup")
 	public ResponseEntity<?> citizenSignup(@RequestBody Citizen citizen) {

@@ -159,8 +159,7 @@ const [employee, setEmployee] = useState({})
     body: JSON.stringify(employee),
   })
   .then(res => res.json())
-  .then(json => setEmployee(json.employee))
-  .then(setEmployees(employee))
+  .then(json => setEmployees(json.employee))
   .then(json => setEmployee({
     fullname: "",
     address: "",
@@ -247,7 +246,7 @@ const form2 = useRef();
         </TableRow>
       </TableHead>
       <TableBody>
-        {employees.length > 0 && employees.map((employeeCarrier) => (   
+        {employees && employees.length > 0 && employees.map((employeeCarrier) => (   
       <Slide direction="up" in={employees} mountOnEnter unmountOnExit>
       <TableRow key={employeeCarrier.id}>
             <TableCell>{employeeCarrier.fullname}</TableCell>
